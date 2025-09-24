@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IBC Shipping - สมัครสมาชิก</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; }
+
+    .background {
+      background: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      animation: moveBg 20s linear infinite alternate;
+    }
+
+    @keyframes moveBg {
+      0% { background-position: center top; }
+      100% { background-position: center bottom; }
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 50px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header .logo {
+      font-size: 26px;
+      font-weight: bold;
+      color: #00e5ff;
+      text-decoration: none;
+    }
+
+    .auth a {
+      padding: 8px 18px;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #00e5ff, #00bcd4);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .auth a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 229, 255, 0.5);
+    }
+
+    .register-card {
+      width: 90%;
+      max-width: 400px;
+      margin: 100px auto;
+      background-color: white;
+      color: #333;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .register-card h2 { margin-bottom: 20px; color: #444; }
+    .input-group { position: relative; margin-bottom: 20px; }
+    .input-group input {
+      width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 25px; font-size: 16px;
+    }
+
+    .register-card button {
+      width: 100%; padding: 12px; background: linear-gradient(135deg, #00e5ff, #00bcd4);
+      border: none; border-radius: 25px; font-size: 16px; font-weight: bold; color: white; cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .register-card button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,229,255,0.5);
+    }
+
+    .optional {
+      font-size: 12px; color: #888; margin-top: -10px; margin-bottom: 15px; display: block; text-align: left;
+    }
+
+    @media screen and (max-width: 480px) {
+      .register-card { margin-top: 60px; padding: 25px 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+
+  <header>
+    <a href="Webpage.html" class="logo">IBC</a>
+    <div class="auth">
+      <a href="login.html">LOGIN</a>
+    </div>
+  </header>
+
+  <div class="register-card">
+    <h2>สมัครสมาชิก</h2>
+    <form action="#" method="post">
+      <div class="input-group">
+        <input type="text" id="username" name="username" placeholder="Username" required>
+      </div>
+      <div class="input-group">
+        <input type="password" id="password" name="password" placeholder="Password" required>
+      </div>
+      <div class="input-group">
+        <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm Password" required>
+      </div>
+      <div class="input-group">
+        <input type="text" id="company-name" name="company-name" placeholder="ชื่อบริษัท" required>
+      </div>
+      <div class="input-group">
+        <input type="text" id="company-address" name="company-address" placeholder="ที่อยู่บริษัท" required>
+      </div>
+      <div class="input-group">
+        <input type="text" id="contact" name="contact" placeholder="ช่องทางการติดต่อ (ถ้ามี)">
+      </div>
+      <button type="submit">สมัครสมาชิก</button>
+    </form>
+  </div>
+</body>
+</html>
