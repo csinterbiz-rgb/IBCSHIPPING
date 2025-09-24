@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBC Shipping - Client Page</title>
+<style>
+  :root {
+    --bg: #f4f4f9;
+    --card: #fff;
+    --muted: #666;
+    --accent: #27ae60;
+    --header: #2c3e50;
+  }
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+  body { margin:0; background: var(--bg); color: #222; }
+
+  header {
+    background: var(--header);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+  }
+  header h1 { font-size: 18px; margin:0; }
+  header .actions button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  header .actions button.exit { background: #e74c3c; }
+
+  .container { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
+  
+  /* ฟอร์ม */
+  .form-card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    display: none;
+  }
+  .form-card.active { display: block; }
+  .form-card input, .form-card select, .form-card button {
+    width: 100%;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  .form-card button { background: var(--accent); color: #fff; border: none; cursor: pointer; }
+
+  /* search box */
+  .search-box { margin-bottom: 15px; }
+  .search-box input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+
+  /* card list */
+  .card-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .card:hover { transform: translateY(-3px); }
+  .card img { width: 100%; height: 150px; object-fit: cover; }
+  .card .content { padding: 10px; }
+  .card .content h3 { margin: 0 0 5px 0; font-size: 15px; }
+  .card .content p { margin: 2px 0; font-size: 13px; color: var(--muted); }
+
+  /* detail pane */
+  .detail-pane {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: none;
+  }
+  .detail-pane.active { display: block; }
+  .detail-pane img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+  .detail-pane h3 { margin: 6px 0; }
+  .detail-pane p { margin: 4px 0; color: var(--muted); font-size: 13px; }
+  .detail-pane .actions { margin-top: 10px; display: flex; gap: 10px; }
+  .detail-pane .actions button { padding: 6px 12px; border-radius: 6px; border:none; cursor:pointer; }
+  .detail-pane .actions button.edit { background: var(--accent); color:#fff; }
+  .detail-pane .actions button.del { background: #e74c3c; color:#fff; }
+
+  /* notification / recent saved */
+  .recent-saved {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    max-width: 300px;
+    background: #27ae60;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+    display: none;
+    z-index: 9999;
+  }
+  .recent-saved h4 { margin:0 0 5px 0; font-size:14px; }
+  .recent-saved p { margin:0; font-size:13px; color:#e0ffe0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>IBC Shipping - Client Page</h1>
+  <div class="actions">
+    <button onclick="toggleForm()">+ กรอกข้อมูล</button>
+    <button class="exit" onclick="exitPage()">Exit</button>
+  </div>
+</header>
+
+<div class="container">
+  <div id="formCard" class="form-card">
+    <h2>ฟอร์มกรอกข้อมูลงาน</h2>
+    <form id="dataForm">
+      <input type="hidden" id="recordId">
+      <input type="text" id="driverName" placeholder="ชื่อคนขับ" required>
+      <input type="text" id="plateNumber" placeholder="ป้ายทะเบียน" required>
+      <input type="text" id="customsNumber" placeholder="เลขใบขน" required>
+      <input type="text" id="blNumber" placeholder="เลข BL/INV" required>
+      <input type="text" id="productName" placeholder="ชื่อสินค้า" required>
+      <input type="date" id="expiryDate" placeholder="วันหมดอายุ (ถ้ามี)">
+      <input type="file" id="imageUpload" accept="image/*">
+      <button type="submit">บันทึก</button>
+      <button type="button" onclick="cancelEdit()" style="background:#ccc;margin-top:5px;">ยกเลิก</button>
+    </form>
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="ค้นหาด้วยชื่อ, ป้ายทะเบียน, เลขใบขน, BL/INV...">
+  </div>
+
+  <div class="card-list" id="cardList"></div>
+  <div id="detailPane" class="detail-pane"></div>
+</div>
+
+<!-- recent saved notification -->
+<div id="recentSaved" class="recent-saved" onclick="editRecord(lastSavedId)">
+  <h4>บันทึกล่าสุด</h4>
+  <p id="recentText"></p>
+</div>
+
+<script>
+  const formCard = document.getElementById('formCard');
+  const dataForm = document.getElementById('dataForm');
+  const cardList = document.getElementById('cardList');
+  const searchInput = document.getElementById('searchInput');
+  const detailPane = document.getElementById('detailPane');
+  const recentSaved = document.getElementById('recentSaved');
+  const recentText = document.getElementById('recentText');
+
+  let records = JSON.parse(localStorage.getItem('records')) || [];
+  let editingId = null;
+  let lastSavedId = null;
+
+  function toggleForm() { formCard.classList.toggle('active'); }
+  function exitPage() { window.location.href = "Webpage.html"; }
+  function cancelEdit() { dataForm.reset(); editingId=null; formCard.classList.remove('active'); detailPane.classList.remove('active'); renderCards(); recentSaved.style.display='none'; }
+
+  function renderCards(filter="") {
+    cardList.innerHTML = "";
+    records
+      .filter(r => !filter || Object.values(r).some(v => v && v.toLowerCase().includes(filter.toLowerCase())))
+      .forEach((r) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          ${r.image ? `<img src="${r.image}" alt="cover">` : ""}
+          <div class="content">
+            <h3>${r.customsNumber} / ${r.blNumber}</h3>
+            <p>คนขับ: ${r.driverName}</p>
+            <p>ทะเบียน: ${r.plateNumber}</p>
+            <p>สินค้า: ${r.productName}</p>
+          </div>
+        `;
+        card.onclick = () => showDetail(r.id);
+        cardList.appendChild(card);
+      });
+  }
+
+  function showDetail(id) {
+    const r = records.find(x => x.id === id);
+    if(!r) { detailPane.classList.remove('active'); return; }
+    detailPane.classList.add('active');
+    detailPane.innerHTML = `
+      ${r.image ? `<img src="${r.image}" alt="cover">` : ""}
+      <h3>${r.customsNumber} / ${r.blNumber}</h3>
+      <p>คนขับ: ${r.driverName}</p>
+      <p>ทะเบียน: ${r.plateNumber}</p>
+      <p>สินค้า: ${r.productName}</p>
+      <p>วันหมดอายุ: ${r.expiryDate || '-'}</p>
+      <div class="actions">
+        <button class="edit" onclick="editRecord('${r.id}')">แก้ไข</button>
+        <button class="del" onclick="deleteRecord('${r.id}')">ลบ</button>
+      </div>
+    `;
+  }
+
+  function editRecord(id) {
+    const r = records.find(x => x.id===id);
+    if(!r) return;
+    editingId = id;
+    formCard.classList.add('active');
+    dataForm.recordId.value = r.id;
+    dataForm.driverName.value = r.driverName;
+    dataForm.plateNumber.value = r.plateNumber;
+    dataForm.customsNumber.value = r.customsNumber;
+    dataForm.blNumber.value = r.blNumber;
+    dataForm.productName.value = r.productName;
+    dataForm.expiryDate.value = r.expiryDate;
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function deleteRecord(id) {
+    if(!confirm("ต้องการลบหรือไม่?")) return;
+    records = records.filter(x => x.id !== id);
+    localStorage.setItem('records', JSON.stringify(records));
+    renderCards(searchInput.value);
+    detailPane.classList.remove('active');
+    if(lastSavedId===id){ recentSaved.style.display='none'; }
+  }
+
+  dataForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const reader = new FileReader();
+    const file = document.getElementById('imageUpload').files[0];
+    const saveData = (imageData="")=>{
+      const id = editingId || 'id_' + Math.random().toString(36).substr(2,9);
+      const record = {
+        id,
+        driverName: dataForm.driverName.value,
+        plateNumber: dataForm.plateNumber.value,
+        customsNumber: dataForm.customsNumber.value,
+        blNumber: dataForm.blNumber.value,
+        productName: dataForm.productName.value,
+        expiryDate: dataForm.expiryDate.value,
+        image: imageData || (editingId ? records.find(r=>r.id===editingId)?.image : '')
+      };
+      if(editingId){
+        records = records.map(r=>r.id===editingId?record:r);
+      } else { records.unshift(record); }
+      localStorage.setItem('records', JSON.stringify(records));
+      renderCards(searchInput.value);
+      dataForm.reset();
+      formCard.classList.remove('active');
+      editingId = null;
+
+      // แสดงกล่อง recent saved
+      lastSavedId = id;
+      recentText.textContent = `${record.productName} - ${record.driverName} / ${record.plateNumber}`;
+      recentSaved.style.display='block';
+    };
+    if(file){
+      reader.onload = ()=>saveData(reader.result);
+      reader.readAsDataURL(file);
+    } else { saveData(); }
+  });
+
+  searchInput.addEventListener('input', (e)=>{
+    renderCards(e.target.value);
+  });
+
+  renderCards();
+</script>
+
+</body>
+</html>

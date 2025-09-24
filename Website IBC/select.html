@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>เลือกเพศ</title>
+<style>
+  /* พื้นหลังเคลื่อนไหวแบบขยับ */
+  @keyframes bgMove {
+    0% {
+      transform: scale(1.05) translateX(0);
+    }
+    50% {
+      transform: scale(1.05) translateX(-20px);
+    }
+    100% {
+      transform: scale(1.05) translateX(0);
+    }
+  }
+
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .bg-container {
+    position: fixed;
+    width: 110%; /* เพิ่มขนาดให้เผื่อขยับ */
+    height: 110%;
+    overflow: hidden;
+    z-index: -2;
+    top: -5%;
+    left: -5%;
+  }
+  .bg-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(6px);
+    animation: bgMove 20s ease-in-out infinite;
+  }
+
+  .bg-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  /* กล่องเลือกเพศและแสดงผล */
+  .container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 40px 60px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    color: #333;
+    z-index: 1;
+  }
+
+  /* กล่องตัวเลือกเพศ */
+  .select-box {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+  }
+
+  .gender-option {
+    flex: 1;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    border-radius: 20px;
+    padding: 20px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    user-select: none;
+  }
+  .gender-option:hover {
+    transform: scale(1.05);
+    border-color: #ff6b81;
+    box-shadow: 0 6px 20px rgba(255,107,129,0.5);
+  }
+  .gender-option.selected {
+    transform: scale(1.1);
+    border-color: #ff4b61;
+    box-shadow: 0 8px 30px rgba(255,75,97,0.7);
+  }
+
+  .gender-icon {
+    font-size: 80px;
+    margin-bottom: 15px;
+    color: #ff6b81;
+  }
+
+  .gender-text {
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  /* ปุ่มยืนยันอยู่ใน container */
+  #confirmBtn {
+    margin-top: 30px;
+    width: 100%;
+    padding: 15px;
+    font-size: 20px;
+    background-color: #ff6b81;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    opacity: 0.6;
+    user-select: none;
+  }
+  #confirmBtn.enabled {
+    opacity: 1;
+  }
+  #confirmBtn:hover.enabled {
+    background-color: #ff4b61;
+  }
+
+  /* กล่องแสดงข้อมูลหลังเลือกเพศ */
+  .result-box {
+    margin-top: 20px;
+    text-align: left;
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    color: #444;
+    line-height: 1.6;
+    font-size: 16px;
+    display: none;
+    white-space: pre-wrap; /* ให้ขึ้นบรรทัดตามข้อความ */
+  }
+  .result-box h1 {
+    margin-top: 0;
+    font-size: 32px;
+    color: #ff4b61;
+    font-weight: 700;
+  }
+  .result-box p {
+    margin: 6px 0;
+  }
+
+  /* Responsive */
+  @media(max-width: 550px) {
+    .select-box {
+      flex-direction: column;
+    }
+    .gender-option {
+      margin-bottom: 20px;
+    }
+    .container {
+      padding: 30px 20px;
+      width: 95%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-container">
+  <img src="bg1.jpg" alt="Background">
+</div>
+<div class="bg-overlay"></div>
+
+<div class="container" role="main">
+  <div class="select-box" id="selectionArea">
+    <div class="gender-option" id="men" tabindex="0" role="button" aria-pressed="false" aria-label="เลือกเพศชาย">
+      <div class="gender-icon">👦</div>
+      <div class="gender-text">MEN</div>
+    </div>
+    <div class="gender-option" id="women" tabindex="0" role="button" aria-pressed="false" aria-label="เลือกเพศหญิง">
+      <div class="gender-icon">👧</div>
+      <div class="gender-text">WOMEN</div>
+    </div>
+  </div>
+
+  <button id="confirmBtn" disabled aria-disabled="true">ยืนยัน</button>
+
+  <div class="result-box" id="resultBox" aria-live="polite"></div>
+</div>
+
+<script>
+  const menOption = document.getElementById('men');
+  const womenOption = document.getElementById('women');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const resultBox = document.getElementById('resultBox');
+  const selectionArea = document.getElementById('selectionArea');
+
+  let selectedGender = null;
+
+  function updateAria() {
+    menOption.setAttribute('aria-pressed', selectedGender === 'men');
+    womenOption.setAttribute('aria-pressed', selectedGender === 'women');
+  }
+
+  function selectGender(gender) {
+    selectedGender = gender;
+    if (gender === 'men') {
+      menOption.classList.add('selected');
+      womenOption.classList.remove('selected');
+    } else {
+      womenOption.classList.add('selected');
+      menOption.classList.remove('selected');
+    }
+    updateAria();
+    confirmBtn.disabled = false;
+    confirmBtn.classList.add('enabled');
+    confirmBtn.setAttribute('aria-disabled', 'false');
+    resultBox.style.display = 'none'; // ซ่อนข้อความก่อนกดยืนยันใหม่
+  }
+
+  menOption.addEventListener('click', () => selectGender('men'));
+  womenOption.addEventListener('click', () => selectGender('women'));
+
+  // รองรับการกด Enter หรือ Space บนคีย์บอร์ด
+  menOption.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      selectGender('men');
+    }
+  });
+  womenOption.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      selectGender('women');
+    }
+  });
+
+  confirmBtn.addEventListener('click', () => {
+    if (!selectedGender) return;
+
+    // ซ่อนส่วนเลือกเพศและปุ่ม
+    selectionArea.style.display = 'none';
+    confirmBtn.style.display = 'none';
+
+    // แสดงเนื้อหาตามเพศที่เลือก
+    if (selectedGender === 'men') {
+      resultBox.innerHTML = `
+        <h1>Witerz</h1>
+        <p>ผมชื่อเด็กชาย ทศพล ปฎิสังข์ ชื่อเล่นชื่อว่า "วินเทอร์ส"</p>
+        <p>พ่อชื่อ นันทกานต์ ปฎิสังข์ ชื่อเล่น"นัน" &nbsp;&nbsp;แม่ชื่อ ดารินทร์ ดวงกมล ชื่อเล่น "ข้าวปุ้น"</p>
+        <p>สวัสดีครับ พ่อนัน แม่ข้าวปุ้น ตอนนี้วินเทอร์ส ยังไม่เกิดเล๊ยยย แต่อีกไม่นานแล้วพ่อกับแม่รอวินเทอร์สก่อนนะจั๊ฟ</p>
+      `;
+    } else {
+      resultBox.innerHTML = `
+        <h1>Gift</h1>
+        <p>หนูชื่อเด็กหญิง รินรดา ปฎิสังข์ ชื่อเล่นชื่อว่า "กิ๊ฟ"</p>
+        <p>พ่อชื่อ นันทกานต์ ปฎิสังข์ ชื่อเล่น"นัน" &nbsp;&nbsp;แม่ชื่อ ดารินทร์ ดวงกมล ชื่อเล่น "ข้าวปุ้น"</p>
+        <p>สวัสดีค่ะ พ่อนัน แม่ข้าวปุ้น ตอนนี้กิ๊ฟ ยังไม่เกิดเล๊ยยย แต่อีกไม่นานแล้วพ่อกับแม่รอวินเทอร์สก่อนนะคะ</p>
+      `;
+    }
+
+    resultBox.style.display = 'block';
+  });
+</script>
+
+</body>
+</html>
